@@ -2,9 +2,9 @@ import axios from "axios";
 import mysql from "mysql2/promise";
 import * as crypto from "crypto";
 
-//  ****** 개발시 dotenv 설치 후 주석해제 ******
-// import { configDotenv } from "dotenv";
-// configDotenv();
+// TODO 개발시 dotenv 설치 후 주석해제 ******
+import { configDotenv } from "dotenv";
+configDotenv();
 
 export const handler = async (event) => {
   try {
@@ -128,8 +128,9 @@ export const handler = async (event) => {
           decryptIv: Buffer.from(`${decryptIv}`, "hex"),
         };
       }
+
+      let count = 0;
       for (const result of accessData) {
-        const { female_number, male_number } = result;
         const decryptedMaleNumber = decryptData(result.male_number);
         console.log("Decrypted Male Number:", decryptedMaleNumber);
         const decryptedFemaleNumber = decryptData(result.female_number);
@@ -144,43 +145,40 @@ export const handler = async (event) => {
           content: "성사 안내 컨텐츠",
           messages: [
             {
-              to: female_number,
+              to: decryptedMaleNumber,
               subject: "[온리유]",
               content: msg,
             },
             {
-              to: male_number,
+              to: decryptedFemaleNumber,
               subject: "[온리유]",
               content: msg,
             },
           ],
         };
 
-        // ****** 문자발송 ******
-        // const response = await axios.post(url, body, { headers });
-        // console.log(response.data);
+        // TODO 문자발송 ******
+        console.log("@@@@ test @@@");
+        const response = await axios.post(url, body, { headers });
+        console.log("@@@@ response @@@", response.data);
 
-        // ****** 디스코드 ******
-        // await axios.post(
-        //   process.env.DISCORD_WEBHOOK_URL,
-        //   {
-        //     content: `female: ${female_number} male: ${male_number} 문자발송완료`,
-        //   }
-        // );
+        // 결과 카운트
+        count++;
+        // TODO 디스코드 ******
+        await axios.post(process.env.DISCORD_WEBHOOK_URL, {
+          content: `female: ${result.female_number} male: ${result.male_number} ${count}쌍 문자발송완료`,
+        });
       }
-      // ****** 정상작동 완료 후 디스코드 웹훅 *******
-      // await axios.post(
-      //   process.env.DISCORD_WEBHOOK_URL,
-      //   {
-      //     content: `작동 완료되었습니다.`,
-      //   }
-      // );
+      // TODO 정상작동 완료 후 디스코드 웹훅 *******
+      await axios.post(process.env.DISCORD_WEBHOOK_URL, {
+        content: `작동 완료되었습니다.`,
+      });
       console.info("디스코드 웹훅 성공");
     } finally {
       connection.release();
     }
   } catch (error) {
-    console.error("디스코드 웹훅 실패", error);
+    console.error("디스코드 웹훅 실패", error.response);
   }
 
   const response = {
@@ -191,5 +189,5 @@ export const handler = async (event) => {
   return response;
 };
 
-// ****** 로컬 테스트할 경우 주석해제 ******
+// TODO 로컬 테스트할 경우 주석해제 ******
 handler();
