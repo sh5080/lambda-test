@@ -3,8 +3,8 @@ import mysql from "mysql2/promise";
 import * as crypto from "crypto";
 
 // TODO 개발시 dotenv 설치 후 주석해제 ******
-import { configDotenv } from "dotenv";
-configDotenv();
+// import { configDotenv } from "dotenv";
+// configDotenv();
 
 export const handler = async (event) => {
   try {
@@ -158,7 +158,7 @@ export const handler = async (event) => {
         };
 
         // TODO 문자발송 ******
-        console.log("@@@@ test @@@");
+        // console.log("@@@@ test @@@");
         const response = await axios.post(url, body, { headers });
         console.log("@@@@ response @@@", response.data);
 
@@ -166,19 +166,19 @@ export const handler = async (event) => {
         count++;
         // TODO 디스코드 ******
         await axios.post(process.env.DISCORD_WEBHOOK_URL, {
-          content: `female: ${result.female_number} male: ${result.male_number} ${count}쌍 문자발송완료`,
+          content: `female: ${decryptedFemaleNumber} male: ${decryptedMaleNumber} ${count}쌍 문자발송완료`,
         });
       }
       // TODO 정상작동 완료 후 디스코드 웹훅 *******
       await axios.post(process.env.DISCORD_WEBHOOK_URL, {
-        content: `작동 완료되었습니다.`,
+        content: `총 ${count} 쌍의 문자 발송 완료되었습니다.`,
       });
       console.info("디스코드 웹훅 성공");
     } finally {
       connection.release();
     }
   } catch (error) {
-    console.error("디스코드 웹훅 실패", error.response);
+    console.error("디스코드 웹훅 실패", error);
   }
 
   const response = {
@@ -190,4 +190,4 @@ export const handler = async (event) => {
 };
 
 // TODO 로컬 테스트할 경우 주석해제 ******
-handler();
+// handler();
