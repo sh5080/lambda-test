@@ -38,7 +38,8 @@ export const getNonSelectDataQuery = () => {
         LEFT JOIN users female ON mp.female_id = female.id
         LEFT JOIN users male ON mp.male_id = male.id
         WHERE gs.id = (SELECT MAX(id) FROM global_status)
-          AND mp.deadline > NOW()
+        AND gs.status = 1  
+        AND mp.deadline > NOW()
           AND mp.f_choice = 0
           AND mp.m_choice = 0;
       `;
@@ -54,7 +55,8 @@ export const getDormantDataQuery = () => {
         LEFT JOIN users female ON mp.female_id = female.id
         LEFT JOIN users male ON mp.male_id = male.id
         WHERE gs.id = (SELECT MAX(id) FROM global_status)
-          AND mp.deadline < NOW()
+        AND gs.status = 1  
+        AND mp.deadline < NOW()
           AND mp.f_choice = 0
           AND mp.m_choice = 0;
       `;
