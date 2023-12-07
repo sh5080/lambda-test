@@ -21,31 +21,57 @@ export const handler = async (event) => {
     });
     const connection = await pool.getConnection();
     try {
-      const accessQuery = queries.getAccessDataQuery();
-      const [accessData] = await connection.execute(accessQuery);
+      // ****** 기간 내 미선택 / 수락 요청 메세지 ******
+      const nonSelectQuery = queries.getNonSelectQuery();
+      const [nonSelectData] = await connection.execute(nonSelectQuery);
       console.log(
-        "@@@@@@   accessData   @@@@@@@ \n",
-        accessData,
-        "\n@@@@@@   accessData   @@@@@@@"
+        "@@@@@@   nonSelectData   @@@@@@@ \n",
+        nonSelectData,
+        "\n@@@@@@   nonSelectData   @@@@@@@"
       );
-      if (accessData) {
-        await messages.sendAccessSMS(accessData);
+      if (nonSelectData) {
+        await messages.sendNonSelect(nonSelectData);
       }
-      const rejectQuery = queries.getRejectDataQuery();
-      const [rejectData] = await connection.execute(rejectQuery);
+
+      // ****** 기간 내 남성 미선택 / 여성 수락 메세지 ******
+      const maleAcceptQuery = queries.getMaleAcceptenceQuery();
+      const [maleAcceptData] = await connection.execute(maleAcceptQuery);
       console.log(
-        "@@@@@@   rejectData   @@@@@@@ \n",
-        rejectData,
-        "\n@@@@@@   rejectData   @@@@@@@"
+        "@@@@@@   maleAcceptData   @@@@@@@ \n",
+        maleAcceptData,
+        "\n@@@@@@   maleAcceptData   @@@@@@@"
       );
-      if (rejectData) {
-        // TODO sendRejectSMS 메세지내용, 함수 아직 미완성
-        await messages.sendAccessSMS(rejectData);
+      if (maleAcceptData) {
+        await messages.sendAcceptence(maleAcceptData);
+      }
+
+      // ****** 기간 내 여성 미선택 / 남성 수락 메세지 ******
+      const femaleAcceptQuery = queries.getFemaleAcceptenceQuery();
+      const [femaleAcceptData] = await connection.execute(femaleAcceptQuery);
+      console.log(
+        "@@@@@@   femaleAcceptData   @@@@@@@ \n",
+        femaleAcceptData,
+        "\n@@@@@@   femaleAcceptData   @@@@@@@"
+      );
+      if (femaleAcceptData) {
+        await messages.sendAcceptence(femaleAcceptData);
+      }
+
+      // ****** 기간 내 미선택 / 수락 가능 기간 지난 후 메세지 ******
+      const dormantQuery = queries.getDormantQuery();
+      const [dormantData] = await connection.execute(dormantQuery);
+      console.log(
+        "@@@@@@   dormantData   @@@@@@@ \n",
+        dormantData,
+        "\n@@@@@@   dormantData   @@@@@@@"
+      );
+      if (dormantData) {
+        await messages.sendDormant(dormantData);
       }
 
       // TODO 정상작동 완료 후 디스코드 웹훅 *******
       await axios.post(process.env.DISCORD_WEBHOOK_URL, {
-        content: `총 ${count} 쌍의 문자 발송 완료되었습니다.`,
+        content: `전체 문자 발송 완료되었습니다.`,
       });
       console.info("디스코드 웹훅 성공");
     } finally {
