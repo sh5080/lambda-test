@@ -19,9 +19,8 @@ const headers = {
   "x-ncp-apigw-signature-v2": key,
 };
 
-const targetSelectMessage =
-  script.NonSelectScript.getNonSelectTargetSelectMessage();
 const nonSelectMessage = script.NonSelectScript.getNonSelectMessage();
+const acceptenceMessage = script.NonSelectScript.getAcceptenceMessage();
 const dormantMessage = script.NonSelectScript.getDormantMessage();
 
 // ****** 미선택 / 수락 요청 메세지 ******
@@ -74,7 +73,7 @@ export async function sendAcceptence(mobileNumber) {
       {
         to: decryptedNumber,
         subject: "[온리유]",
-        content: targetSelectMessage,
+        content: acceptenceMessage,
       },
     ],
   };
